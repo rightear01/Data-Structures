@@ -1,0 +1,180 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct DequeNode{
+	int data;
+	struct DequeNode* Llink, * Rlink;
+}DequeNode;
+
+typedef struct {
+	DequeNode* front, * rear;
+}DequeType;
+
+DequeType* createDeque();
+int isEmpty(DequeType* DQ);
+void inserFront(DequeType* DQ, int item);
+void insertBack(DequeType* DQ, int item);
+int popFront(DequeType* DQ);
+int popBack(DequeType* DQ);
+int getFront(DequeType* DQ);
+int getBack(DequeType* DQ);
+void printDQ(DequeType* DQ);
+void printMainFrame();
+
+int main() {
+	DequeType* DQ = createDeque();
+	printMainFrame();
+	int command, item, flag = 1;
+	while (flag) {
+		printf("COMMAND >>>> "); scanf("%d", &command);
+		switch (command) {
+		case 1: // 1. insertFront
+			printf("insertFront >>>> ");
+			scanf("%d", &item);
+			inserFront(DQ, item);
+			printDQ(DQ);
+			break;
+		case 2: // 2. insertBack
+			printf("insertBack >>>> ");
+			scanf("%d", &item);
+			insertBack(DQ, item);
+			printDQ(DQ);
+			break;
+		case 3: // 3. popFront
+			if (isEmpty(DQ)) { printf("popFront : None\n\n"); }
+			else {
+				printf("popFront : %d\n", popFront(DQ));
+				printDQ(DQ);
+			}
+			break;
+		case 4: // 4. popBack
+			if (isEmpty(DQ)) { printf("popBack : None\n\n"); }
+			else {
+				printf("popBack : %d\n", popBack(DQ));
+				printDQ(DQ);
+			}
+			break;
+		case 5: // 5. getFront
+			if (isEmpty(DQ)) { printf("getFront : None\n\n"); }
+			else {
+				printf("getFront : %d\n", getFront(DQ));
+				printDQ(DQ);
+			}
+			break;
+		case 6: // 6. getBack
+			if (isEmpty(DQ)) { printf("getBack : None\n\n"); }
+			else {
+				printf("getBack : %d\n", getBack(DQ));
+				printDQ(DQ);
+			}
+			break;
+		default:
+			printf("Exit\n"); flag = 0;
+			break;
+		}
+	}
+}
+
+void printMainFrame() {
+	printf("\n******************************************\n");
+	printf("\n******_________Data structure_______******\n");
+	printf("\n******_____________Deque____________******\n");
+	printf("\n******************************************\n\n");
+	printf("1. insertFront\n2. insertBack\n3. popFront\n4. popBack\n5. getFront\n6. getBack\n\n");
+}
+
+DequeType* createDeque() {
+	DequeType* DQ = (DequeType*)malloc(sizeof(DequeType));
+	DQ->front = DQ->rear = NULL;
+	return DQ;
+}
+
+int isEmpty(DequeType* DQ) {
+	if (DQ->front == NULL) return 1;
+	else return 0;
+}
+// 이중 "연결리스트" 자료구조 이기 때문에 포화상태 체크 x
+
+void inserFront(DequeType* DQ, int item) {
+	DequeNode* newNode = (DequeNode*)malloc(sizeof(DequeNode));
+	newNode->data = item;
+	if (isEmpty(DQ)) { // 데큐의 상태가 공백이라면
+		DQ->front = DQ->rear = newNode;
+		newNode->Llink = newNode->Rlink = NULL;
+	}
+	else {
+		newNode->Rlink = DQ->front;
+		newNode->Llink = NULL;
+		DQ->front->Llink = newNode;
+		DQ->front = newNode;
+	}
+}
+
+void insertBack(DequeType* DQ, int item) {
+	DequeNode* newNode = (DequeNode*)malloc(sizeof(DequeNode));
+	newNode->data = item;
+	if (isEmpty(DQ)) { // 데큐의 상태가 공백이라면
+		DQ->front = DQ->rear = newNode;
+		newNode->Llink = newNode->Rlink = NULL;
+	}
+	else {
+		newNode->Llink = DQ->rear;
+		newNode->Rlink = NULL;
+		DQ->rear->Rlink = newNode;
+		DQ->rear = newNode;
+	}
+}
+
+int popFront(DequeType* DQ) {
+	DequeNode* old = DQ->front;
+	int item;
+	if (isEmpty(DQ)) return;
+	else {
+		item = old->data;
+		if (DQ->front->Rlink == NULL) { DQ->front = DQ->rear = NULL; } // 데큐에 원소가 하나 밖에 없는 경우
+		else {
+			DQ->front = DQ->front->Rlink;
+			DQ->front->Llink = NULL;
+		}
+		free(old); return item;
+	}
+}
+
+int popBack(DequeType* DQ) {
+	DequeNode* old = DQ->rear;
+	int item;
+	if (isEmpty(DQ)) return;
+	else {
+		item = old->data;
+		if (DQ->rear->Llink == NULL) { DQ->front = DQ->rear = NULL; } // 데큐에 원소가 하나인 경우
+		else {
+			DQ->rear = DQ->rear->Llink;
+			DQ->rear->Rlink = NULL;
+		}
+		free(old); return item;
+	}
+}
+
+int getFront(DequeType* DQ) {
+	if (isEmpty(DQ)) return;
+	else { return DQ->front->data; }
+}
+
+int getBack(DequeType* DQ) {
+	if (isEmpty(DQ)) return;
+	else { return DQ->rear->data; }
+}
+
+void printDQ(DequeType* DQ) {
+	DequeNode* temp = DQ->front;
+	if (isEmpty(DQ)) printf("Deque : [ EMPTY ]\n\n");
+	else {
+		printf("Deque : [ ");
+		while (temp != NULL) {
+			if (temp->Rlink == NULL) printf("%d ]\n\n", temp->data);
+			else printf("%d, ", temp->data);
+			temp = temp->Rlink;
+		}
+	}
+}
